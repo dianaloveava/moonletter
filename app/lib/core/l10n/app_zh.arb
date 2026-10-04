@@ -1,0 +1,284 @@
+{
+  "@@locale": "zh",
+  "appTitle": "月信",
+  "tabCalendar": "日历",
+  "tabProfiles": "档案",
+  "tabSettings": "设置",
+  "commonCancel": "取消",
+  "commonSave": "保存",
+  "commonDelete": "删除",
+  "commonRetry": "重试",
+  "calendarEmptyMonth": "本月没有记录",
+  "calendarToday": "今天",
+  "calendarMonthLabel": "{year} 年 {month} 月",
+  "@calendarMonthLabel": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "weekdayMon": "一",
+  "weekdayTue": "二",
+  "weekdayWed": "三",
+  "weekdayThu": "四",
+  "weekdayFri": "五",
+  "weekdaySat": "六",
+  "weekdaySun": "日",
+  "calendarPrevMonth": "上个月",
+  "calendarNextMonth": "下个月",
+  "calendarDayEmpty": "这一天没有记录",
+  "dayKindPeriod": "经期",
+  "dayKindPredicted": "预计经期",
+  "dayKindOvulation": "排卵日",
+  "dayKindFertile": "危险期",
+  "dayKindSafe": "安全期",
+  "dayKindUnknown": "无记录",
+  "dayPeriodDay": "经期第 {day} 天",
+  "@dayPeriodDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "dayPredictedPeriodDay": "预计经期第 {day} 天",
+  "@dayPredictedPeriodDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "profilesEmpty": "还没有成员",
+  "profilesAdd": "添加成员",
+  "memberAddTitle": "添加成员",
+  "memberEditTitle": "编辑成员",
+  "memberDetailInfo": "基本信息",
+  "memberDetailCycle": "周期设置",
+  "memberDetailReminder": "提醒",
+  "memberDetailRecords": "经期记录",
+  "memberDetailPredictNext": "下次预计开始",
+  "memberDetailPredictOvulation": "排卵日",
+  "memberDetailPredictFertile": "危险期",
+  "periodOngoingLabel": "进行中",
+  "reminderTitle": "经期提醒",
+  "reminderBodyMember": "{name} 预计 {date} 开始",
+  "@reminderBodyMember": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderBodyNeutral": "经期将至，注意身体",
+  "memberDetailCalendar": "个人日历",
+  "memberRecordsEmpty": "还没有经期记录",
+  "memberRecordsAdd": "添加记录",
+  "memberDeleteTitle": "删除成员",
+  "memberDeleteMessage": "该成员与她的经期记录会从本机移除。",
+  "memberName": "昵称",
+  "memberNameRequired": "请填写昵称",
+  "memberAge": "年龄",
+  "memberHeight": "身高",
+  "memberWeight": "体重",
+  "memberNote": "描述",
+  "memberAvatar": "头像",
+  "memberAvatarPick": "选择照片",
+  "memberAvatarClear": "移除照片",
+  "memberCycleDays": "周期天数",
+  "memberPeriodDays": "经期天数",
+  "memberLastStart": "最近一次开始日期",
+  "memberReminderLead": "提醒提前",
+  "memberReminderFollowGlobal": "跟随全局",
+  "memberAgeRange": "年龄需在 0 到 120 之间",
+  "memberCycleRange": "周期天数需在 15 到 60 之间",
+  "memberPeriodRange": "经期天数需在 1 到 15 之间",
+  "memberStatusPeriod": "经期第 {day} 天",
+  "@memberStatusPeriod": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "memberStatusUpcoming": "距下次 {days} 天",
+  "@memberStatusUpcoming": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "memberStatusLate": "已推迟 {days} 天",
+  "@memberStatusLate": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "memberStatusNoRecords": "还没有记录",
+  "periodAddTitle": "添加经期",
+  "periodEditTitle": "编辑经期",
+  "periodStartLabel": "开始日",
+  "periodEndLabel": "结束日（可留空）",
+  "periodStartRequired": "请选择开始日期",
+  "periodEndBeforeStart": "结束日不能早于开始日",
+  "unitCm": "厘米",
+  "unitKg": "千克",
+  "unitDay": "{days} 天",
+  "@unitDay": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsTitle": "设置",
+  "settingsAbout": "关于",
+  "settingsDebugDatabase": "数据库文件",
+  "settingsDebugRows": "数据表行数",
+  "settingsNotifications": "提醒设置",
+  "settingsReminderLead": "全局提前天数",
+  "settingsReminderHideNames": "通知不显示人名",
+  "settingsReminderPermission": "权限",
+  "settingsReminderNotifications": "通知权限",
+  "settingsReminderExactAlarms": "精确闹钟",
+  "settingsReminderBattery": "电池优化",
+  "settingsReminderBatteryHint": "提醒不准时，把本应用加入电池优化白名单",
+  "settingsReminderAutostartHint": "部分系统需要允许自启动，重启后提醒才有效",
+  "settingsReminderWindowsHint": "关闭程序后不会收到提醒",
+  "settingsReminderAllowed": "已允许",
+  "settingsReminderNotAllowed": "未允许",
+  "settingsReminderNone": "没有需要设置的成员",
+  "commonOn": "开",
+  "commonOff": "关",
+  "lockUnlockTitle": "解锁",
+  "lockEnterPin": "输入 6 位 PIN",
+  "lockWrongPin": "PIN 不正确",
+  "lockCooldown": "请 {seconds} 秒后再试",
+  "@lockCooldown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "lockUseBiometrics": "用生物识别解锁",
+  "lockLocked": "已锁定",
+  "lockSetPin": "设置 6 位 PIN",
+  "lockConfirmPin": "再输一次",
+  "lockPinMismatch": "两次输入不一致",
+  "lockChangePin": "修改 PIN",
+  "lockDisable": "关闭应用锁",
+  "lockDisableConfirm": "关闭后打开应用不再需要解锁。",
+  "lockHintImmediate": "切到后台会立即锁定并隐藏内容",
+  "settingsPrivacy": "隐私",
+  "settingsAppLock": "应用锁",
+  "settingsBiometric": "生物识别解锁",
+  "settingsGeneral": "通用",
+  "settingsLanguage": "语言",
+  "settingsLanguageSystem": "跟随系统",
+  "settingsAppearance": "外观",
+  "settingsThemeMode": "主题模式",
+  "settingsThemeSystem": "跟随系统",
+  "settingsThemeLight": "浅色",
+  "settingsThemeDark": "深色",
+  "settingsThemeColor": "主题色",
+  "settingsBlur": "界面模糊效果",
+  "settingsBlurHint": "低端设备建议关闭",
+  "settingsPrediction": "预测规则",
+  "settingsPredictionWindow": "参与平均的记录条数",
+  "settingsPredictionFallbackCycle": "默认周期天数",
+  "settingsPredictionFallbackPeriod": "默认经期天数",
+  "settingsPredictionOvulationOffset": "排卵日提前天数",
+  "settingsPredictionFertileBefore": "危险期提前天数",
+  "settingsPredictionFertileAfter": "危险期延后天数",
+  "settingsVersion": "版本",
+  "settingsLicense": "开源协议",
+  "settingsRepository": "仓库",
+  "settingsDisclaimer": "预测结果仅供参考，不能作为避孕或医疗依据。",
+  "settingsWindows": "Windows",
+  "settingsAutostart": "开机自启",
+  "settingsCloseToTray": "关闭窗口最小化到托盘",
+  "settingsUpdate": "自动更新",
+  "settingsAutoCheckUpdate": "启动时检查更新",
+  "settingsCheckUpdate": "检查更新",
+  "settingsUpdateAvailable": "发现新版本 {version}",
+  "@settingsUpdateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsUpToDate": "已是最新版本",
+  "settingsUpdateFailed": "检查更新失败",
+  "settingsUpdateOpen": "打开下载页",
+  "settingsData": "数据",
+  "settingsImportExport": "导入导出",
+  "accentRose": "玫瑰",
+  "accentPeach": "蜜桃",
+  "accentAmber": "琥珀",
+  "accentMoss": "苔绿",
+  "accentMint": "薄荷",
+  "accentMist": "雾蓝",
+  "accentLavender": "薰衣草",
+  "accentGraphite": "石墨",
+  "dataExportJson": "导出数据（JSON）",
+  "dataExportCsv": "导出经期（CSV）",
+  "dataImport": "导入数据",
+  "dataExportCancelled": "已取消",
+  "dataExportedMembers": "已导出 {count} 个成员",
+  "@dataExportedMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataExportedPeriods": "已导出 {count} 条经期记录",
+  "@dataExportedPeriods": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataImportedRecords": "已导入 {count} 条记录",
+  "@dataImportedRecords": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataExportFailed": "导出失败",
+  "dataImportFailed": "导入失败",
+  "syncTitle": "云同步",
+  "syncEnabled": "启用同步",
+  "syncBackend": "同步方式",
+  "syncBackendWebdav": "WebDAV",
+  "syncBackendRelay": "中转服务",
+  "syncWebdavUrl": "服务地址",
+  "syncWebdavUser": "用户名",
+  "syncWebdavPassword": "密码",
+  "syncWebdavDir": "子目录",
+  "syncRelayUrl": "服务地址",
+  "syncNamespace": "同步 ID",
+  "syncPassphrase": "口令",
+  "syncPassphraseSet": "设置口令",
+  "syncPassphraseWarn": "口令只保存在本机且不上传。丢失后无法解密已上传的数据，也无法找回。",
+  "syncNow": "立即同步",
+  "syncLastAt": "上次同步",
+  "syncNever": "还没有同步过",
+  "syncReset": "重置同步",
+  "syncResetConfirm": "会清空远端数据并删除本机保存的密钥，需要重新设置口令。"
+}

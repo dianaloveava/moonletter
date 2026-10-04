@@ -1,0 +1,39 @@
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+build/
+coverage/
+*.iml
+.idea/
+.vscode/
+
+# Android
+**/android/.gradle/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
+*.keystore
+
+# Windows
+**/windows/flutter/ephemeral/
+**/windows/flutter/generated_plugin_registrant.*
+**/windows/flutter/generated_plugins.cmake
+*.pdb
+
+# Node tooling
+/tools/**/node_modules/
+
+# Relay worker
+/server/relay/.wrangler/
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db

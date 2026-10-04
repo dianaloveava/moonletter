@@ -1,0 +1,8 @@
+name = "moonletter-relay"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# 同步数据都存在 R2 里，只保存客户端加密后的密文。
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "moonletter-sync"

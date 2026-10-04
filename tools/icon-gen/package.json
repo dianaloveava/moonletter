@@ -1,0 +1,14 @@
+{
+  "name": "moonletter-icon-gen",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Rasterize app/assets/icon/*.svg into launcher icons, tray icon and app_icon.ico",
+  "scripts": {
+    "gen": "node gen.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "png-to-ico": "^2.1.8"
+  }
+}

@@ -1,0 +1,79 @@
+name: moonletter
+description: "月信 · Moonletter — 数据本地的多人经期记录应用。"
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # 状态与路由
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.0.2
+
+  # 数据层：sqlite3 3.x 自带原生库（native assets），无需 sqlite3_flutter_libs
+  drift: ^2.35.1
+  sqlite3: ^3.5.2
+  path_provider: ^2.1.6
+  flutter_secure_storage: ^10.3.4
+
+  # 通知与安全
+  flutter_local_notifications: ^22.3.1
+  timezone: ^0.11.1
+  flutter_timezone: ^5.1.1
+  local_auth: ^3.0.2
+  cryptography: ^2.9.0
+
+  # 文件与图片
+  file_picker: ^11.0.3
+  image: ^4.10.1
+
+  # 桌面端
+  window_manager: ^0.5.2
+  tray_manager: ^0.7.0
+  launch_at_startup: ^0.5.1
+
+  # 同步与杂项
+  http: ^1.6.0
+  webdav_client: ^1.2.2
+  uuid: ^4.6.0
+  package_info_plus: ^9.0.1
+  url_launcher: ^6.3.3
+  intl: ^0.20.3
+  cupertino_icons: ^1.0.8
+  path: ^1.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.35.1
+  build_runner: ^2.16.1
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/icon/logo_512.png
+    - assets/icon/tray_32.png
+    - assets/icon/tray.ico
+
+  # Inter 静态字重（OFL）；中文使用系统字体，见 tokens.dart 的 fontFamilyFallback
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/inter/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/inter/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/inter/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/inter/Inter-Bold.ttf
+          weight: 700
