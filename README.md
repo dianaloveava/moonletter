@@ -4,7 +4,7 @@
 
 # 月信 · Moonletter
 
-月有信，日有期。
+**「月有信，日有期」**
 
 [English](README.en.md) · 中文
 

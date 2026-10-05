@@ -4,7 +4,7 @@
 
 # Moonletter
 
-A letter each month, a date to keep.
+**A letter each month, a date to keep.**
 
 [中文](README.md) · English
 
