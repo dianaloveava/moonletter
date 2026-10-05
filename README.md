@@ -8,7 +8,9 @@
   底部彩色圆底个人日历区分经期 / 排卵与危险期 / 安全期
 - 预测：周期与经期天数取最近 6 次记录平均，不足时用档案值；排卵 = 下次开始前 14 天，
   危险期 = 排卵前 5 后 4，全部参数可在设置里调整
-- 提醒：系统通知按每人预测的下次开始日提前 N 天触发；Windows 上通知依赖程序运行
+- 提醒：系统通知按每人预测的下次开始日提前 N 天触发；Windows 上通知依赖程序运行；
+  Android 需要通知与精确闹钟权限（应用内「提醒设置」会引导开启），部分厂商系统还会
+  拦截开机广播，需在系统设置里允许本应用自启动，否则重启后要打开一次应用才会恢复提醒
 - 隐私：应用锁（PIN / 生物识别）、切后台隐藏预览、同步前本地加密、无统计与追踪
 
 > 预测结果仅供参考，不能作为避孕或医疗依据。
@@ -28,7 +30,7 @@ packaging/windows/   Windows 安装包脚本（Inno Setup 6）
 
 - Flutter 3.47+（stable）
 - Windows：Visual Studio 2022+，需要「使用 C++ 的桌面开发」工作负载
-  以及 **C++ ATL**（`atlbase.h`，通知与安全存储插件需要）
+  以及 **C++ ATL**（`flutter_secure_storage_windows` 需要 `atlstr.h`）
 - Android：Android SDK（platform 36+）、JDK 17+
 - 其余依赖由 `flutter pub get` 自动拉取；SQLite 原生库由 `package:sqlite3` 的
   native assets 提供，首次构建会编译一次
@@ -58,7 +60,11 @@ cd app && flutter build windows --release
 # 产物：build/installer/Moonletter-<版本>-setup.exe
 ```
 
-Android（正式签名需要 `app/android/key.properties`，仓库中不含）：
+安装界面用的 `packaging/windows/ChineseSimplified.isl` 随仓库提供（Inno Setup 官方安装
+里不带中文语言文件）。
+
+Android（正式签名需要 `app/android/key.properties`，仓库中不含；缺它时上面的命令
+仍然能构建，但产物是 **debug 证书签名**，只能自测不能发布）：
 
 ```bash
 cd app && flutter build apk --release

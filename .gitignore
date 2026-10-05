@@ -28,7 +28,7 @@ coverage/
 *.pdb
 
 # Node tooling
-/tools/**/node_modules/
+node_modules/
 
 # Relay worker
 /server/relay/.wrangler/

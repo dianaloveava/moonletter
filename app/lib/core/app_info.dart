@@ -4,8 +4,7 @@ abstract final class AppInfo {
   static const String nameEn = 'Moonletter';
   static const String displayName = '月信 · Moonletter';
 
-  /// 占位：换成真实 owner 后同步更新 README。
-  static const String repoOwner = 'YOURNAME';
+  static const String repoOwner = 'dianaloveava';
   static const String repoName = 'moonletter';
   static const String repoUrl = 'https://github.com/$repoOwner/$repoName';
   static const String releasesApiUrl =
