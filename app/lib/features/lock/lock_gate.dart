@@ -158,36 +158,50 @@ class _LockGateState extends ConsumerState<LockGate> {
     final bool locked = ref.watch(appLockProvider);
     final bool biometricEnabled =
         ref.watch(biometricAvailableProvider).value ?? false;
-
-    if (_covered) {
-      return const _PrivacyCover();
-    }
-    if (!locked) {
-      return widget.child;
-    }
+    // 遮罩与解锁页都盖在内容之上，而不是替换它：后台往返（系统文件选择器、
+    // 切到别的应用）不能让页面被销毁，否则正在进行的异步操作会在恢复时
+    // 拿到已经销毁的 State 而失败。
+    final bool obscured = _covered || locked;
 
     final AppLocalizations l10n = AppLocalizations.of(context);
     final AppColors colors = context.colors;
-    // MaterialApp 的 builder 在 Navigator 之上，没有 Material 祖先，
-    // 而数字键盘用的是 InkWell，所以这里补一层 Material。
-    return Material(
-      color: colors.bg,
-      child: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.x3),
-            child: PinEntry(
-              value: _pin,
-              title: l10n.lockEnterPin,
-              error: _error,
-              onDigit: _onDigit,
-              onBackspace: _onBackspace,
-              onBiometrics: biometricEnabled ? _authenticate : null,
-              biometricSemanticLabel: l10n.lockUseBiometrics,
-            ),
+
+    return Stack(
+      children: <Widget>[
+        AbsorbPointer(
+          absorbing: obscured,
+          child: ExcludeSemantics(
+            excluding: obscured,
+            child: TickerMode(enabled: !obscured, child: widget.child),
           ),
         ),
-      ),
+        if (_covered)
+          const Positioned.fill(child: _PrivacyCover())
+        else if (locked)
+          Positioned.fill(
+            // MaterialApp 的 builder 在 Navigator 之上，没有 Material 祖先，
+            // 而数字键盘用的是 InkWell，所以这里补一层 Material。
+            child: Material(
+              color: colors.bg,
+              child: SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSpacing.x3),
+                    child: PinEntry(
+                      value: _pin,
+                      title: l10n.lockEnterPin,
+                      error: _error,
+                      onDigit: _onDigit,
+                      onBackspace: _onBackspace,
+                      onBiometrics: biometricEnabled ? _authenticate : null,
+                      biometricSemanticLabel: l10n.lockUseBiometrics,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/gen/app_localizations.dart';
 import '../../core/motion.dart';
 import '../../core/theme/tokens.dart';
 import '../../widgets/glass_bar.dart';
@@ -116,6 +117,7 @@ class _PadKey extends StatelessWidget {
       return Semantics(
         container: true,
         button: true,
+        excludeSemantics: true,
         label: biometricSemanticLabel,
         onTap: onBiometrics,
         child: InkWell(
@@ -134,7 +136,10 @@ class _PadKey extends StatelessWidget {
     return Semantics(
       container: true,
       button: true,
-      label: isDelete ? '删除' : value,
+      excludeSemantics: true,
+      label: isDelete
+          ? AppLocalizations.of(context).commonDelete
+          : value,
       onTap: isDelete ? onBackspace : () => onDigit(value),
       child: InkWell(
         onTap: isDelete ? onBackspace : () => onDigit(value),
