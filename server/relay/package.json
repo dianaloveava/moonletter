@@ -1,0 +1,17 @@
+{
+  "name": "moonletter-relay",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Cloudflare Worker + R2 object relay for 月信 Moonletter encrypted sync",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5",
+    "typescript": "^5",
+    "wrangler": "^4"
+  }
+}

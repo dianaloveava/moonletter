@@ -9,12 +9,16 @@
  * 鉴权：Authorization: Bearer {ns}；ns 同时充当命名空间与访问凭据。
  */
 
+interface Env {
+  BUCKET: R2Bucket;
+}
+
 const NS_PATTERN = /^[a-z2-7]{26}$/;
 const PATH_PATTERN = /^[A-Za-z0-9._/-]+$/;
 const MAX_OBJECT_SIZE = 8 * 1024 * 1024;
 
 export default {
-  async fetch(request, env) {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === '/health') {
       return new Response('ok', { status: 200 });
@@ -97,7 +101,7 @@ export default {
   },
 };
 
-function json(payload, status = 200) {
+function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {
     status,
     headers: { 'Content-Type': 'application/json' },

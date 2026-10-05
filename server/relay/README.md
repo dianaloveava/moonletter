@@ -32,7 +32,7 @@ base32，形如 `abcd...`），同时充当局域网关与访问凭据；因为�
 ## 本地开发
 
 ```bash
-npx wrangler dev --local --port 8787
+npx wrangler dev --port 8787
 ```
 
-本地模式下 R2 由 miniflare 模拟，数据存在 `.wrangler/` 下。
+本地模式下 R2 由 miniflare 模拟，数据存在 `.wrangler/` 下；`npm install` 与 `npm run check`（`tsc --noEmit`）用于安装依赖与类型检查。
