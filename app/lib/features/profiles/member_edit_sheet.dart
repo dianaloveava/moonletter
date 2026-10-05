@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import '../../core/l10n/gen/app_localizations.dart';
 import '../../core/theme/tokens.dart';
@@ -9,6 +10,8 @@ import '../../core/utils/dates.dart';
 import '../../data/data_providers.dart';
 import '../../data/db/database.dart';
 import '../../data/repo/member_repository.dart';
+import '../../domain/prediction/prediction_config.dart';
+import '../../domain/prediction/prediction_providers.dart';
 import '../../widgets/bottom_sheet_scaffold.dart';
 import '../../widgets/squircle.dart';
 
@@ -41,11 +44,13 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
   late final TextEditingController _note;
   late final TextEditingController _cycleDays;
   late final TextEditingController _periodDays;
+  final TextEditingController _avatarUrl = TextEditingController();
 
   String? _avatarHash;
   String? _lastStart;
   int? _reminderLead;
   bool _saving = false;
+  bool _avatarBusy = false;
 
   bool get _isEditing => widget.member != null;
 
@@ -99,7 +104,51 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
     _note.dispose();
     _cycleDays.dispose();
     _periodDays.dispose();
+    _avatarUrl.dispose();
     super.dispose();
+  }
+
+  /// 从图片链接取头像：下载原图后走和「选择照片」同一条缩放、内容寻址存储的路径，
+  /// 存的是图片本身（hash），不保存外链，离线与同步行为跟本地照片一致。
+  Future<void> _loadAvatarFromUrl() async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final Uri? uri = Uri.tryParse(_avatarUrl.text.trim());
+    if (uri == null ||
+        !uri.hasScheme ||
+        (uri.scheme != 'http' && uri.scheme != 'https')) {
+      _snack(l10n.memberAvatarUrlFailed);
+      return;
+    }
+    setState(() => _avatarBusy = true);
+    try {
+      final http.Response response = await http
+          .get(uri)
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode != 200) {
+        _snack(l10n.memberAvatarUrlFailed);
+        return;
+      }
+      final String hash = await ref
+          .read(avatarStoreProvider)
+          .saveFromImage(response.bodyBytes);
+      if (mounted) {
+        setState(() => _avatarHash = hash);
+      }
+    } catch (_) {
+      _snack(l10n.memberAvatarUrlFailed);
+    } finally {
+      if (mounted) {
+        setState(() => _avatarBusy = false);
+      }
+    }
+  }
+
+  void _snack(String message) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _pickAvatar() async {
@@ -225,6 +274,7 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final AppColors colors = context.colors;
+    final PredictionConfig config = ref.watch(predictionConfigProvider);
 
     return Form(
       key: _formKey,
@@ -237,6 +287,9 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
             colorIndex: widget.member?.colorIndex ?? 0,
             onPick: _pickAvatar,
             onClear: () => setState(() => _avatarHash = null),
+            urlController: _avatarUrl,
+            onLoadUrl: _loadAvatarFromUrl,
+            busy: _avatarBusy,
           ),
           const SizedBox(height: AppSpacing.x3),
           _SheetField(
@@ -307,6 +360,13 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
             l10n.memberDetailCycle,
             style: AppType.bodySmall.copyWith(color: colors.textSecondary),
           ),
+          const SizedBox(height: AppSpacing.x1 / 2),
+          Text(
+            l10n.memberDefaultHint(config.fallbackCycle),
+            style: AppType.caption.copyWith(
+              color: colors.textSecondary.withValues(alpha: 0.7),
+            ),
+          ),
           const SizedBox(height: AppSpacing.x1),
           _SheetField(
             label: l10n.memberCycleDays,
@@ -316,7 +376,10 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              decoration: _inputDecoration(colors),
+              decoration: _inputDecoration(
+                colors,
+                hintText: '${config.fallbackCycle}',
+              ),
               validator: (String? value) {
                 final int? days = _parseInt(value ?? '');
                 if (days != null && (days < 15 || days > 60)) {
@@ -334,7 +397,10 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              decoration: _inputDecoration(colors),
+              decoration: _inputDecoration(
+                colors,
+                hintText: '${config.fallbackPeriod}',
+              ),
               validator: (String? value) {
                 final int? days = _parseInt(value ?? '');
                 if (days != null && (days < 1 || days > 15)) {
@@ -388,20 +454,26 @@ class _MemberEditSheetState extends ConsumerState<MemberEditSheet> {
     );
   }
 
-  InputDecoration _inputDecoration(AppColors colors) => InputDecoration(
-    isDense: true,
-    filled: true,
-    fillColor: colors.surfaceAlt,
-    contentPadding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.x2,
-      vertical: 12,
-    ),
-    border: const SquircleInputBorder(),
-    enabledBorder: const SquircleInputBorder(),
-    focusedBorder: SquircleInputBorder(
-      borderSide: BorderSide(color: colors.accent, width: 1.5),
-    ),
-  );
+  InputDecoration _inputDecoration(AppColors colors, {String? hintText}) =>
+      InputDecoration(
+        isDense: true,
+        filled: true,
+        fillColor: colors.surfaceAlt,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.x2,
+          vertical: 12,
+        ),
+        hintText: hintText,
+        // 提示默认值用更淡的灰：只是占位暗示，别让人以为已经填过。
+        hintStyle: AppType.body.copyWith(
+          color: colors.textSecondary.withValues(alpha: 0.5),
+        ),
+        border: const SquircleInputBorder(),
+        enabledBorder: const SquircleInputBorder(),
+        focusedBorder: SquircleInputBorder(
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
+        ),
+      );
 }
 
 class _SheetField extends StatelessWidget {
@@ -494,6 +566,9 @@ class _AvatarPicker extends ConsumerWidget {
     required this.colorIndex,
     required this.onPick,
     required this.onClear,
+    required this.urlController,
+    required this.onLoadUrl,
+    required this.busy,
   });
 
   final String? hash;
@@ -501,73 +576,119 @@ class _AvatarPicker extends ConsumerWidget {
   final int colorIndex;
   final VoidCallback onPick;
   final VoidCallback onClear;
+  final TextEditingController urlController;
+  final VoidCallback onLoadUrl;
+  final bool busy;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final AppColors colors = context.colors;
     final String? avatarHash = hash;
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SizedBox(
-          width: 64,
-          height: 64,
-          child: ClipPath(
-            clipper: const SquircleClipper(radius: 32),
-            child: avatarHash == null
-                ? ColoredBox(
-                    color:
-                        kDefaultAvatarColors[colorIndex %
-                            kDefaultAvatarColors.length],
-                    child: Center(
+        Row(
+          children: <Widget>[
+            SizedBox(
+              width: 64,
+              height: 64,
+              child: ClipPath(
+                clipper: const SquircleClipper(radius: 32),
+                child: avatarHash == null
+                    ? ColoredBox(
+                        color:
+                            kDefaultAvatarColors[colorIndex %
+                                kDefaultAvatarColors.length],
+                        child: Center(
+                          child: Text(
+                            name.trim().isEmpty
+                                ? '?'
+                                : String.fromCharCode(name.trim().runes.first),
+                            style: AppType.title.copyWith(color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : FutureBuilder<Uint8List?>(
+                        future: ref.read(avatarStoreProvider).read(avatarHash),
+                        builder:
+                            (
+                              BuildContext context,
+                              AsyncSnapshot<Uint8List?> snapshot,
+                            ) => snapshot.hasData && snapshot.data != null
+                            ? Image.memory(
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                                gaplessPlayback: true,
+                              )
+                            : ColoredBox(color: colors.surfaceAlt),
+                      ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.x2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  OutlinedButton(
+                    onPressed: onPick,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colors.accent,
+                      side: BorderSide(color: colors.accent, width: 1),
+                      shape: const SquircleBorder(radius: AppRadii.control),
+                    ),
+                    child: Text(l10n.memberAvatarPick),
+                  ),
+                  if (hash != null)
+                    TextButton(
+                      onPressed: onClear,
                       child: Text(
-                        name.trim().isEmpty
-                            ? '?'
-                            : String.fromCharCode(name.trim().runes.first),
-                        style: AppType.title.copyWith(color: Colors.white),
+                        l10n.memberAvatarClear,
+                        style: TextStyle(color: colors.textSecondary),
                       ),
                     ),
-                  )
-                : FutureBuilder<Uint8List?>(
-                    future: ref.read(avatarStoreProvider).read(avatarHash),
-                    builder:
-                        (
-                          BuildContext context,
-                          AsyncSnapshot<Uint8List?> snapshot,
-                        ) => snapshot.hasData && snapshot.data != null
-                        ? Image.memory(
-                            snapshot.data!,
-                            fit: BoxFit.cover,
-                            gaplessPlayback: true,
-                          )
-                        : ColoredBox(color: colors.surfaceAlt),
-                  ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.x2),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              OutlinedButton(
-                onPressed: onPick,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: colors.accent,
-                  side: BorderSide(color: colors.accent, width: 1),
-                  shape: const SquircleBorder(radius: AppRadii.control),
-                ),
-                child: Text(l10n.memberAvatarPick),
+                ],
               ),
-              if (hash != null)
-                TextButton(
-                  onPressed: onClear,
-                  child: Text(
-                    l10n.memberAvatarClear,
-                    style: TextStyle(color: colors.textSecondary),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.x2),
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: TextField(
+                controller: urlController,
+                keyboardType: TextInputType.url,
+                style: AppType.body.copyWith(color: colors.text),
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  fillColor: colors.surfaceAlt,
+                  hintText: l10n.memberAvatarUrlHint,
+                  hintStyle: AppType.body.copyWith(
+                    color: colors.textSecondary.withValues(alpha: 0.6),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.x2,
+                    vertical: 12,
+                  ),
+                  border: const SquircleInputBorder(),
+                  enabledBorder: const SquircleInputBorder(),
+                  focusedBorder: SquircleInputBorder(
+                    borderSide: BorderSide(color: colors.accent, width: 1.5),
                   ),
                 ),
-            ],
-          ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.x1),
+            TextButton(
+              onPressed: busy ? null : onLoadUrl,
+              child: Text(
+                busy ? '…' : l10n.memberAvatarUrlLoad,
+                style: TextStyle(color: colors.accent),
+              ),
+            ),
+          ],
         ),
       ],
     );

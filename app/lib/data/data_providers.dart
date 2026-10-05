@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/app_paths.dart';
@@ -68,30 +67,3 @@ final StreamProvider<List<Member>> membersProvider =
     StreamProvider<List<Member>>(
       (Ref ref) => ref.watch(memberRepositoryProvider).watchAll(),
     );
-
-/// 调试用的数据库概览：文件路径 + 各表行数（含墓碑）。Step 5 换成正式「关于」内容。
-class DbStats {
-  const DbStats({required this.path, required this.rows});
-
-  final String path;
-  final Map<String, int> rows;
-}
-
-final FutureProvider<DbStats> dbStatsProvider = FutureProvider<DbStats>((
-  Ref ref,
-) async {
-  final AppDatabase db = ref.watch(databaseProvider);
-  Future<int> rowsOf(Selectable<int> query) => query.getSingle();
-  return DbStats(
-    path: ref.watch(appPathsProvider).databaseFile.path,
-    rows: <String, int>{
-      'members': await rowsOf(db.members.count()),
-      'periods': await rowsOf(db.periods.count()),
-      'settings': await rowsOf(db.settings.count()),
-      'kv': await rowsOf(db.kv.count()),
-      'pending_changes': await rowsOf(db.pendingChanges.count()),
-      'remote_files': await rowsOf(db.remoteFiles.count()),
-      'reminder_log': await rowsOf(db.reminderLog.count()),
-    },
-  );
-});

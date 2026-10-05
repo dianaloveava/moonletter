@@ -122,27 +122,48 @@ class GroupRow extends StatelessWidget {
         horizontal: AppSpacing.x2,
         vertical: 14,
       ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(label, style: AppType.body.copyWith(color: labelColor)),
-          ),
-          if (value != null) ...<Widget>[
-            const SizedBox(width: AppSpacing.x1),
-            Text(
-              value!,
-              style: AppType.body.copyWith(color: colors.textSecondary),
-            ),
-          ],
-          if (trailing != null) ...<Widget>[
-            const SizedBox(width: AppSpacing.x1),
-            trailing!,
-          ],
-          if (onTap != null) ...<Widget>[
-            const SizedBox(width: AppSpacing.x1),
-            Icon(Icons.chevron_right, size: 18, color: colors.textSecondary),
-          ],
-        ],
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          // 值最多占行宽的 62%：过长的地址换行，而不是把左边的标签挤到没有宽度。
+          final double maxValueWidth = constraints.maxWidth * 0.62;
+          return Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppType.body.copyWith(color: labelColor),
+                ),
+              ),
+              if (value != null) ...<Widget>[
+                const SizedBox(width: AppSpacing.x1),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxValueWidth),
+                  child: Text(
+                    value!,
+                    textAlign: TextAlign.right,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppType.body.copyWith(color: colors.textSecondary),
+                  ),
+                ),
+              ],
+              if (trailing != null) ...<Widget>[
+                const SizedBox(width: AppSpacing.x1),
+                trailing!,
+              ],
+              if (onTap != null) ...<Widget>[
+                const SizedBox(width: AppSpacing.x1),
+                Icon(
+                  Icons.chevron_right,
+                  size: 18,
+                  color: colors.textSecondary,
+                ),
+              ],
+            ],
+          );
+        },
       ),
     );
 

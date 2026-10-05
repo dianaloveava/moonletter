@@ -121,6 +121,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get memberDetailCycle => '周期设置';
 
   @override
+  String memberDefaultHint(int days) {
+    return '不填写就按全局默认（$days 天）';
+  }
+
+  @override
   String get memberDetailReminder => '提醒';
 
   @override
@@ -190,6 +195,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get memberAvatarClear => '移除照片';
+
+  @override
+  String get memberAvatarUrl => '图片链接';
+
+  @override
+  String get memberAvatarUrlHint => 'https:// 图片地址';
+
+  @override
+  String get memberAvatarUrlLoad => '载入';
+
+  @override
+  String get memberAvatarUrlFailed => '链接打不开或不是图片';
 
   @override
   String get memberCycleDays => '周期天数';
@@ -267,12 +284,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsAbout => '关于';
-
-  @override
-  String get settingsDebugDatabase => '数据库文件';
-
-  @override
-  String get settingsDebugRows => '数据表行数';
 
   @override
   String get settingsNotifications => '提醒设置';
@@ -498,10 +509,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accentGraphite => '石墨';
 
   @override
-  String get dataExportJson => '导出数据（JSON）';
-
-  @override
-  String get dataExportCsv => '导出经期（CSV）';
+  String get dataExport => '导出数据';
 
   @override
   String get dataImport => '导入数据';
@@ -573,6 +581,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncPassphraseWarn => '口令只保存在本机且不上传。丢失后无法解密已上传的数据，也无法找回。';
 
   @override
+  String get syncPassphraseTooShort => '口令至少 8 位';
+
+  @override
   String get syncNow => '立即同步';
 
   @override
@@ -580,6 +591,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get syncNever => '还没有同步过';
+
+  @override
+  String get syncPassphraseNeeded => '先输入同步口令，再同步';
+
+  @override
+  String get syncSetupRequired => '先填好同步服务地址和密码，再同步';
 
   @override
   String get syncReset => '重置同步';

@@ -42,8 +42,16 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
                 routes: <RouteBase>[
                   GoRoute(
                     path: ':id',
-                    builder: (BuildContext context, GoRouterState state) =>
-                        MemberDetailPage(memberId: state.pathParameters['id']!),
+                    // 用 MaterialPage 而不是 builder：builder 生成的路由由
+                    // go_router 自己接管过渡（零时长），吃不到主题里的
+                    // pageTransitionsTheme，页面就会硬切。
+                    pageBuilder: (BuildContext context, GoRouterState state) =>
+                        MaterialPage<void>(
+                          key: state.pageKey,
+                          child: MemberDetailPage(
+                            memberId: state.pathParameters['id']!,
+                          ),
+                        ),
                   ),
                 ],
               ),
@@ -56,25 +64,38 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
                 builder: (BuildContext context, GoRouterState state) =>
                     const SettingsPage(),
                 routes: <RouteBase>[
+                  // 同上：子页面走 MaterialPage，才会用主题里的页面过渡动画。
                   GoRoute(
                     path: 'notifications',
-                    builder: (BuildContext context, GoRouterState state) =>
-                        const NotificationSettingsPage(),
+                    pageBuilder: (BuildContext context, GoRouterState state) =>
+                        MaterialPage<void>(
+                          key: state.pageKey,
+                          child: const NotificationSettingsPage(),
+                        ),
                   ),
                   GoRoute(
                     path: 'lock',
-                    builder: (BuildContext context, GoRouterState state) =>
-                        const LockSettingsPage(),
+                    pageBuilder: (BuildContext context, GoRouterState state) =>
+                        MaterialPage<void>(
+                          key: state.pageKey,
+                          child: const LockSettingsPage(),
+                        ),
                   ),
                   GoRoute(
                     path: 'data',
-                    builder: (BuildContext context, GoRouterState state) =>
-                        const DataSettingsPage(),
+                    pageBuilder: (BuildContext context, GoRouterState state) =>
+                        MaterialPage<void>(
+                          key: state.pageKey,
+                          child: const DataSettingsPage(),
+                        ),
                   ),
                   GoRoute(
                     path: 'sync',
-                    builder: (BuildContext context, GoRouterState state) =>
-                        const SyncSettingsPage(),
+                    pageBuilder: (BuildContext context, GoRouterState state) =>
+                        MaterialPage<void>(
+                          key: state.pageKey,
+                          child: const SyncSettingsPage(),
+                        ),
                   ),
                 ],
               ),

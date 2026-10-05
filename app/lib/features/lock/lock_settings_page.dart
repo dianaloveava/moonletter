@@ -41,7 +41,9 @@ class LockSettingsPage extends ConsumerWidget {
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.only(bottom: AppSpacing.x4),
+          padding: EdgeInsets.only(
+            bottom: AppSpacing.x4 + MediaQuery.paddingOf(context).bottom,
+          ),
           children: <Widget>[
             GroupedList(
               sections: <Widget>[
@@ -101,6 +103,7 @@ class LockSettingsPage extends ConsumerWidget {
 
     final String? action = await showModalBottomSheet<String>(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext sheetContext) {
         final AppColors colors = sheetContext.colors;

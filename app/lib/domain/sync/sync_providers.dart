@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/dates.dart';
@@ -23,6 +24,12 @@ class SyncState {
   final DateTime? lastSyncAt;
   final String? error;
 }
+
+/// 同步尚未配置（缺服务地址或密码）时 [SyncState.error] 的取值，由界面翻成本地化文案。
+const String kSyncSetupRequired = 'sync-setup-required';
+
+/// 远端还是空的（或本机没记住主密钥）、必须由用户输入口令时的 error 取值。
+const String kSyncPassphraseRequired = 'sync-passphrase-required';
 
 /// 按设置里的配置组装远端存储；没配置好时返回 null。
 RemoteStorage? buildRemoteStorage({
@@ -73,7 +80,7 @@ class SyncController extends Notifier<SyncState> {
         webdavPassword: webdavPassword,
       );
       if (storage == null) {
-        state = const SyncState(error: '请先填写同步信息');
+        state = const SyncState(error: kSyncSetupRequired);
         return;
       }
       final SyncEngine engine = SyncEngine(
@@ -93,12 +100,20 @@ class SyncController extends Notifier<SyncState> {
             '读取 ${result.filesRead} 个文件，合并 ${result.recordsApplied} 条，'
             '上传 ${result.recordsUploaded} 条',
       );
+    } on SyncPassphraseNeeded {
+      state = const SyncState(error: kSyncPassphraseRequired);
     } on SyncAuthException catch (error) {
       state = SyncState(error: error.message, lastSyncAt: state.lastSyncAt);
     } on SyncException catch (error) {
       state = SyncState(error: error.message, lastSyncAt: state.lastSyncAt);
     } catch (error) {
-      state = SyncState(error: '同步失败：$error', lastSyncAt: state.lastSyncAt);
+      // 网络/服务端错误原样抛出来是 DioException 这类开发者文案，对用户
+      // 没有意义：页面只给一句能照着排查的话，细节留给日志。
+      debugPrint('同步失败：$error');
+      state = SyncState(
+        error: '同步失败：连不上同步服务，检查服务地址、账号密码和网络',
+        lastSyncAt: state.lastSyncAt,
+      );
     }
   }
 

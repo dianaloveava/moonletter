@@ -26,6 +26,12 @@ class SyncAuthException extends SyncException {
   const SyncAuthException() : super('口令不正确');
 }
 
+/// 需要用户先给口令：远端还没有 kdf.json，或本机没有记住主密钥。
+/// 与 [SyncAuthException] 区分开，界面才能当场问口令重试，而不是报「口令不正确」。
+class SyncPassphraseNeeded extends SyncException {
+  const SyncPassphraseNeeded() : super('需要同步口令');
+}
+
 /// 一次同步的结果。
 class SyncResult {
   const SyncResult({
@@ -156,7 +162,7 @@ class SyncEngine {
       // 远端还是空的：用当前口令新建 kdf.json。
       final String effective = passphrase ?? '';
       if (effective.isEmpty) {
-        throw const SyncAuthException();
+        throw const SyncPassphraseNeeded();
       }
       final String kdfJson = await SyncCrypto.buildKdfJson(effective);
       await storage.put(kdfPath, Uint8List.fromList(utf8.encode(kdfJson)));
@@ -188,7 +194,7 @@ class SyncEngine {
     if (storedKey != null) {
       return SyncCrypto.importKey(storedKey);
     }
-    throw const SyncAuthException();
+    throw const SyncPassphraseNeeded();
   }
 
   Future<void> _rememberKey(SecretKey master, String kdfJson) async {

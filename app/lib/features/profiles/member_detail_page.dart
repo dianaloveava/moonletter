@@ -89,11 +89,11 @@ class MemberDetailPage extends ConsumerWidget {
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(
+              padding: EdgeInsets.fromLTRB(
                 AppSpacing.pageMobile,
                 0,
                 AppSpacing.pageMobile,
-                AppSpacing.x4,
+                AppSpacing.x4 + MediaQuery.paddingOf(context).bottom,
               ),
               children: <Widget>[
                 _IdentityCard(member: current, status: status),

@@ -61,7 +61,9 @@ class ProfilesPage extends ConsumerWidget {
           ),
         AsyncData<List<Member>>(value: final List<Member> v) =>
           ListView.separated(
-            padding: const EdgeInsets.only(bottom: AppSpacing.x4),
+            padding: EdgeInsets.only(
+              bottom: AppSpacing.x4 + MediaQuery.paddingOf(context).bottom,
+            ),
             itemCount: v.length,
             separatorBuilder: (BuildContext context, int index) =>
                 const SizedBox(height: AppSpacing.x2),

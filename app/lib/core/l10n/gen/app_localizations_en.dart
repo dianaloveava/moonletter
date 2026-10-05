@@ -121,6 +121,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get memberDetailCycle => 'Cycle';
 
   @override
+  String memberDefaultHint(int days) {
+    return 'Leave empty to use the global default ($days days)';
+  }
+
+  @override
   String get memberDetailReminder => 'Reminder';
 
   @override
@@ -191,6 +196,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get memberAvatarClear => 'Remove photo';
+
+  @override
+  String get memberAvatarUrl => 'Image link';
+
+  @override
+  String get memberAvatarUrlHint => 'https:// image URL';
+
+  @override
+  String get memberAvatarUrlLoad => 'Load';
+
+  @override
+  String get memberAvatarUrlFailed =>
+      'Could not download an image from this link';
 
   @override
   String get memberCycleDays => 'Cycle length';
@@ -269,12 +287,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAbout => 'About';
-
-  @override
-  String get settingsDebugDatabase => 'Database file';
-
-  @override
-  String get settingsDebugRows => 'Table rows';
 
   @override
   String get settingsNotifications => 'Notifications';
@@ -505,10 +517,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accentGraphite => 'Graphite';
 
   @override
-  String get dataExportJson => 'Export data (JSON)';
-
-  @override
-  String get dataExportCsv => 'Export periods (CSV)';
+  String get dataExport => 'Export data';
 
   @override
   String get dataImport => 'Import data';
@@ -581,6 +590,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'The passphrase stays on this device and is never uploaded. If it is lost, the uploaded data cannot be decrypted or recovered.';
 
   @override
+  String get syncPassphraseTooShort => 'Use at least 8 characters';
+
+  @override
   String get syncNow => 'Sync now';
 
   @override
@@ -588,6 +600,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncNever => 'Never synced';
+
+  @override
+  String get syncPassphraseNeeded => 'Enter the sync passphrase before syncing';
+
+  @override
+  String get syncSetupRequired =>
+      'Fill in the server address and password first';
 
   @override
   String get syncReset => 'Reset sync';

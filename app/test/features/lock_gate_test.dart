@@ -69,9 +69,10 @@ void main() {
     await settings.set(SettingKeys.lockKind, locked ? 'pin' : 'none');
     if (locked) {
       // 真正写一次 PIN 记录，让 hasPin / lockKind 走真实路径。
-      await LockService(secure: secure, settings: settings).setPin(
-        _FakeLockService.pin,
-      );
+      await LockService(
+        secure: secure,
+        settings: settings,
+      ).setPin(_FakeLockService.pin);
     }
     return ProviderScope(
       overrides: [
@@ -132,11 +133,7 @@ void main() {
     await tester.pumpWidget(gate);
     await tester.pumpAndSettle();
 
-    expect(
-      semanticsExposes(tester, '内容页'),
-      isFalse,
-      reason: '锁着的时候不暴露内容',
-    );
+    expect(semanticsExposes(tester, '内容页'), isFalse, reason: '锁着的时候不暴露内容');
     expect(tester.takeException(), isNull, reason: '解锁页不该抛异常');
     expect(find.bySemanticsLabel('1'), findsOneWidget, reason: '数字键盘已渲染');
 
@@ -148,11 +145,7 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('内容页'), findsOneWidget, reason: 'PIN 正确后解锁');
-    expect(
-      semanticsExposes(tester, '内容页'),
-      isTrue,
-      reason: '解锁后内容可读',
-    );
+    expect(semanticsExposes(tester, '内容页'), isTrue, reason: '解锁后内容可读');
     handle.dispose();
     await unmount(tester);
   });
@@ -206,11 +199,7 @@ void main() {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
     await tester.pumpAndSettle();
     expect(find.text('已锁定'), findsOneWidget, reason: '后台显示隐私遮罩');
-    expect(
-      semanticsExposes(tester, '内容页'),
-      isFalse,
-      reason: '遮罩期间不暴露内容',
-    );
+    expect(semanticsExposes(tester, '内容页'), isFalse, reason: '遮罩期间不暴露内容');
 
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpAndSettle();

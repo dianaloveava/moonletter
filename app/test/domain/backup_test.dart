@@ -47,9 +47,8 @@ void main() {
       ),
     );
     await periods.add(id, '2026-10-01', endDate: '2026-10-05');
-    final String avatarHash = await AvatarStore(
-      AppPaths.forTesting(dir),
-    ).saveFromImage(_pngBytes());
+    final String avatarHash = await AvatarStore(AppPaths.forTesting(dir))
+        .saveFromImage(_pngBytes());
     await members.setAvatarHash(id, avatarHash);
 
     final List<SyncRecord> exported = await repository.collectRecords();
@@ -92,7 +91,8 @@ void main() {
     expect(targetMembers.single.defaultCycleDays, 30);
     expect(targetMembers.single.avatarHash, avatarHash);
     expect(
-      File(AppPaths.forTesting(targetDir).avatarFile(avatarHash).path).existsSync(),
+      File(AppPaths.forTesting(targetDir).avatarFile(avatarHash).path)
+          .existsSync(),
       isTrue,
       reason: '头像文件也要恢复',
     );
@@ -126,7 +126,10 @@ void main() {
       deleted: true,
     );
 
-    expect(mergeRecords(<SyncRecord>[older], <SyncRecord>[newer]).single.updatedAt, 200);
+    expect(
+      mergeRecords(<SyncRecord>[older], <SyncRecord>[newer]).single.updatedAt,
+      200,
+    );
     expect(
       mergeRecords(<SyncRecord>[deletion], <SyncRecord>[older]).single.deleted,
       isTrue,
@@ -152,8 +155,14 @@ void main() {
       updatedBy: 'device-b',
       data: <String, Object?>{'start': '2026-10-02'},
     );
-    expect(mergeRecords(<SyncRecord>[a], <SyncRecord>[b]).single.updatedBy, 'device-b');
-    expect(mergeRecords(<SyncRecord>[b], <SyncRecord>[a]).single.updatedBy, 'device-b');
+    expect(
+      mergeRecords(<SyncRecord>[a], <SyncRecord>[b]).single.updatedBy,
+      'device-b',
+    );
+    expect(
+      mergeRecords(<SyncRecord>[b], <SyncRecord>[a]).single.updatedBy,
+      'device-b',
+    );
   });
 
   test('导入不会覆盖更新的本地记录', () async {
@@ -165,7 +174,10 @@ void main() {
         id: id,
         updatedAt: local.updatedAt - 1000,
         updatedBy: 'other-device',
-        data: <String, Object?>{'name': '别的设备上的旧名字', 'createdAt': local.createdAt},
+        data: <String, Object?>{
+          'name': '别的设备上的旧名字',
+          'createdAt': local.createdAt,
+        },
       ),
     ];
     final List<SyncRecord> localRecords = await repository.collectRecords(
@@ -253,7 +265,10 @@ void main() {
   test('备份文件格式不对时报错', () {
     expect(() => decodeBackupJson('{"format":"other"}'), throwsFormatException);
     expect(() => decodeBackupJson('不是 JSON'), throwsFormatException);
-    expect(() => decodeBackupJson('{"format":"moonletter","version":9}'), throwsFormatException);
+    expect(
+      () => decodeBackupJson('{"format":"moonletter","version":9}'),
+      throwsFormatException,
+    );
   });
 }
 

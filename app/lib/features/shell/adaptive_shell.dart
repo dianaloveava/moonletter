@@ -6,6 +6,10 @@ import '../../core/motion.dart';
 import '../../core/theme/tokens.dart';
 import '../../widgets/glass_bar.dart';
 
+/// 底部导航栏高度（不含系统手势区）。窄屏下页面内容会延伸到它下面，
+/// 所以外壳把这段高度加进 [MediaQuery] 的底部内边距，页面按需给列表留位置。
+const double kBottomBarHeight = 56;
+
 /// 三个分支的共用外壳：窄屏用底部导航，宽屏（≥ [AppSpacing.breakpoint]）换成左侧边栏。
 class AdaptiveShell extends StatelessWidget {
   const AdaptiveShell({super.key, required this.navigationShell});
@@ -28,7 +32,10 @@ class AdaptiveShell extends StatelessWidget {
                       constraints: const BoxConstraints(
                         maxWidth: AppSpacing.contentMaxWidth,
                       ),
-                      child: navigationShell,
+                      child: _BranchTransition(
+                        index: navigationShell.currentIndex,
+                        child: navigationShell,
+                      ),
                     ),
                   ),
                 ),
@@ -36,12 +43,76 @@ class AdaptiveShell extends StatelessWidget {
             ),
           );
         }
+        final EdgeInsets padding = MediaQuery.paddingOf(context);
         return Scaffold(
           extendBody: true,
-          body: navigationShell,
+          body: MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              padding: padding.copyWith(
+                bottom: padding.bottom + kBottomBarHeight,
+              ),
+            ),
+            child: _BranchTransition(
+              index: navigationShell.currentIndex,
+              child: navigationShell,
+            ),
+          ),
           bottomNavigationBar: _BottomBar(navigationShell: navigationShell),
         );
       },
+    );
+  }
+}
+
+/// 切换分支时的淡入 + 轻微上移；子树保持同一实例，各分支页面状态不丢。
+class _BranchTransition extends StatefulWidget {
+  const _BranchTransition({required this.index, required this.child});
+
+  final int index;
+  final Widget child;
+
+  @override
+  State<_BranchTransition> createState() => _BranchTransitionState();
+}
+
+class _BranchTransitionState extends State<_BranchTransition>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: Motion.medium,
+    value: 1,
+  );
+  late final CurvedAnimation _curve = CurvedAnimation(
+    parent: _controller,
+    curve: Motion.spring,
+  );
+
+  @override
+  void didUpdateWidget(_BranchTransition oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.index != widget.index) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _curve.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _curve,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.012),
+          end: Offset.zero,
+        ).animate(_curve),
+        child: widget.child,
+      ),
     );
   }
 }

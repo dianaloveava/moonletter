@@ -137,9 +137,7 @@ class _PadKey extends StatelessWidget {
       container: true,
       button: true,
       excludeSemantics: true,
-      label: isDelete
-          ? AppLocalizations.of(context).commonDelete
-          : value,
+      label: isDelete ? AppLocalizations.of(context).commonDelete : value,
       onTap: isDelete ? onBackspace : () => onDigit(value),
       child: InkWell(
         onTap: isDelete ? onBackspace : () => onDigit(value),
@@ -233,6 +231,7 @@ Future<String?> showPinSetupSheet({
 }) async {
   return showModalBottomSheet<String>(
     context: context,
+    useRootNavigator: true,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (BuildContext sheetContext) => _PinSetupSheet(

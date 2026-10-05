@@ -308,6 +308,12 @@ abstract class AppLocalizations {
   /// **'周期设置'**
   String get memberDetailCycle;
 
+  /// No description provided for @memberDefaultHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'不填写就按全局默认（{days} 天）'**
+  String memberDefaultHint(int days);
+
   /// No description provided for @memberDetailReminder.
   ///
   /// In zh, this message translates to:
@@ -446,6 +452,30 @@ abstract class AppLocalizations {
   /// **'移除照片'**
   String get memberAvatarClear;
 
+  /// No description provided for @memberAvatarUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'图片链接'**
+  String get memberAvatarUrl;
+
+  /// No description provided for @memberAvatarUrlHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'https:// 图片地址'**
+  String get memberAvatarUrlHint;
+
+  /// No description provided for @memberAvatarUrlLoad.
+  ///
+  /// In zh, this message translates to:
+  /// **'载入'**
+  String get memberAvatarUrlLoad;
+
+  /// No description provided for @memberAvatarUrlFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'链接打不开或不是图片'**
+  String get memberAvatarUrlFailed;
+
   /// No description provided for @memberCycleDays.
   ///
   /// In zh, this message translates to:
@@ -583,18 +613,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'关于'**
   String get settingsAbout;
-
-  /// No description provided for @settingsDebugDatabase.
-  ///
-  /// In zh, this message translates to:
-  /// **'数据库文件'**
-  String get settingsDebugDatabase;
-
-  /// No description provided for @settingsDebugRows.
-  ///
-  /// In zh, this message translates to:
-  /// **'数据表行数'**
-  String get settingsDebugRows;
 
   /// No description provided for @settingsNotifications.
   ///
@@ -1034,17 +1052,11 @@ abstract class AppLocalizations {
   /// **'石墨'**
   String get accentGraphite;
 
-  /// No description provided for @dataExportJson.
+  /// No description provided for @dataExport.
   ///
   /// In zh, this message translates to:
-  /// **'导出数据（JSON）'**
-  String get dataExportJson;
-
-  /// No description provided for @dataExportCsv.
-  ///
-  /// In zh, this message translates to:
-  /// **'导出经期（CSV）'**
-  String get dataExportCsv;
+  /// **'导出数据'**
+  String get dataExport;
 
   /// No description provided for @dataImport.
   ///
@@ -1172,6 +1184,12 @@ abstract class AppLocalizations {
   /// **'口令只保存在本机且不上传。丢失后无法解密已上传的数据，也无法找回。'**
   String get syncPassphraseWarn;
 
+  /// No description provided for @syncPassphraseTooShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'口令至少 8 位'**
+  String get syncPassphraseTooShort;
+
   /// No description provided for @syncNow.
   ///
   /// In zh, this message translates to:
@@ -1189,6 +1207,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'还没有同步过'**
   String get syncNever;
+
+  /// No description provided for @syncPassphraseNeeded.
+  ///
+  /// In zh, this message translates to:
+  /// **'先输入同步口令，再同步'**
+  String get syncPassphraseNeeded;
+
+  /// No description provided for @syncSetupRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'先填好同步服务地址和密码，再同步'**
+  String get syncSetupRequired;
 
   /// No description provided for @syncReset.
   ///

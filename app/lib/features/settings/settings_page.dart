@@ -40,15 +40,13 @@ class SettingsPage extends ConsumerWidget {
       _ => const <String, String>{},
     };
     final String version = ref.watch(appVersionProvider).value ?? '—';
-    final DbStats? stats = switch (ref.watch(dbStatsProvider)) {
-      AsyncData<DbStats>(value: final DbStats value) => value,
-      _ => null,
-    };
 
     return PageFrame(
       title: l10n.settingsTitle,
       child: ListView(
-        padding: const EdgeInsets.only(bottom: AppSpacing.x4),
+        padding: EdgeInsets.only(
+          bottom: AppSpacing.x4 + MediaQuery.paddingOf(context).bottom,
+        ),
         children: <Widget>[
           GroupedList(
             sections: <Widget>[
@@ -252,8 +250,6 @@ class SettingsPage extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.x2),
-          _DebugCard(stats: stats),
         ],
       ),
     );
@@ -436,6 +432,7 @@ Future<T?> _pickOption<T>(
 }) {
   return showModalBottomSheet<T>(
     context: context,
+    useRootNavigator: true,
     backgroundColor: Colors.transparent,
     builder: (BuildContext sheetContext) {
       final AppColors colors = sheetContext.colors;
@@ -533,72 +530,6 @@ class _Swatch extends StatelessWidget {
                 : Border.all(color: colors.separator, width: 0.5),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// 数据库调试信息（Step 1 遗留，正式版可以删）。
-class _DebugCard extends StatelessWidget {
-  const _DebugCard({required this.stats});
-
-  final DbStats? stats;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final AppColors colors = context.colors;
-    final DbStats? data = stats;
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.x2),
-      decoration: ShapeDecoration(
-        color: colors.surface,
-        shape: SquircleBorder(
-          radius: AppRadii.card,
-          side: BorderSide(color: colors.separator, width: 0.5),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            l10n.settingsDebugDatabase,
-            style: AppType.bodySmall.copyWith(color: colors.textSecondary),
-          ),
-          const SizedBox(height: AppSpacing.x1),
-          SelectableText(
-            data?.path ?? '—',
-            style: AppType.caption.copyWith(color: colors.text),
-          ),
-          const SizedBox(height: AppSpacing.x2),
-          Text(
-            l10n.settingsDebugRows,
-            style: AppType.bodySmall.copyWith(color: colors.textSecondary),
-          ),
-          const SizedBox(height: AppSpacing.x1),
-          if (data != null)
-            for (final MapEntry<String, int> row in data.rows.entries)
-              Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.x1),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        row.key,
-                        style: AppType.caption.copyWith(
-                          color: colors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '${row.value}',
-                      style: AppType.caption.copyWith(color: colors.text),
-                    ),
-                  ],
-                ),
-              ),
-        ],
       ),
     );
   }

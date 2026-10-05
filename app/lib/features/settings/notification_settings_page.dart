@@ -86,7 +86,9 @@ class _NotificationSettingsPageState
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.only(bottom: AppSpacing.x4),
+          padding: EdgeInsets.only(
+            bottom: AppSpacing.x4 + MediaQuery.paddingOf(context).bottom,
+          ),
           children: <Widget>[
             GroupedList(
               sections: <Widget>[
@@ -165,6 +167,7 @@ class _NotificationSettingsPageState
   Future<void> _pickLeadDays(int current) async {
     final int? picked = await showModalBottomSheet<int>(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext sheetContext) {
         final AppColors colors = sheetContext.colors;

@@ -52,7 +52,9 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.only(bottom: AppSpacing.x4),
+          padding: EdgeInsets.only(
+            bottom: AppSpacing.x4 + MediaQuery.paddingOf(context).bottom,
+          ),
           children: <Widget>[
             GroupedList(
               sections: <Widget>[
@@ -152,7 +154,11 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.x1),
                 child: Text(
-                  sync.error ?? sync.message ?? '',
+                  switch (sync.error) {
+                    kSyncSetupRequired => l10n.syncSetupRequired,
+                    kSyncPassphraseRequired => l10n.syncPassphraseNeeded,
+                    _ => sync.error ?? sync.message ?? '',
+                  },
                   style: AppType.caption.copyWith(
                     color: sync.error != null
                         ? colors.periodRed
@@ -190,11 +196,12 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
         if (!confirmed) {
           return;
         }
-        final String? passphrase = await _askText(
-          title: l10n.syncPassphrase,
-          obscure: true,
-        );
-        if (passphrase == null || passphrase.length < 8) {
+        final String? passphrase = await _askPassphrase();
+        if (passphrase == null) {
+          return;
+        }
+        final bool ready = await _ensureWebdavConfig();
+        if (!ready) {
           return;
         }
         await ref
@@ -213,10 +220,63 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
     }
   }
 
+  /// 索要口令，太短就带着提示重来（不是静默失败），用户取消才返回 null。
+  Future<String?> _askPassphrase({String? errorText}) async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final String? value = await _askText(
+      title: l10n.syncPassphrase,
+      obscure: true,
+      errorText: errorText,
+    );
+    if (value == null) {
+      return null;
+    }
+    if (value.length < 8) {
+      return _askPassphrase(errorText: l10n.syncPassphraseTooShort);
+    }
+    return value;
+  }
+
+  /// 开启同步前补齐 WebDAV 服务地址与密码：都是同步的必要信息，
+  /// 缺一个就当场问，避免开完开关只能看到「请先填写同步信息」。
+  Future<bool> _ensureWebdavConfig() async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final Map<String, String> settings = switch (ref.read(settingsProvider)) {
+      AsyncData<Map<String, String>>(value: final Map<String, String> v) => v,
+      _ => const <String, String>{},
+    };
+    if ((settings[SettingKeys.syncWebdavUrl] ?? '').trim().isEmpty) {
+      final String? url = await _askText(title: l10n.syncWebdavUrl);
+      if (url == null || url.trim().isEmpty) {
+        return false;
+      }
+      await ref
+          .read(settingsRepositoryProvider)
+          .set(SettingKeys.syncWebdavUrl, url.trim());
+    }
+    final String? password = await ref
+        .read(secureStoreProvider)
+        .read(SecureStore.keyWebdavPassword);
+    if (password == null || password.isEmpty) {
+      final String? typed = await _askText(
+        title: l10n.syncWebdavPassword,
+        obscure: true,
+      );
+      if (typed == null || typed.isEmpty) {
+        return false;
+      }
+      await ref
+          .read(secureStoreProvider)
+          .write(SecureStore.keyWebdavPassword, typed);
+    }
+    return true;
+  }
+
   Future<void> _pickBackend(bool relay) async {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final String? picked = await showModalBottomSheet<String>(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext sheetContext) {
         final AppColors colors = sheetContext.colors;
@@ -319,6 +379,18 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
       await ref
           .read(syncControllerProvider.notifier)
           .syncNow(passphrase: passphrase);
+      // 远端还是空的、本机又没记住主密钥时，引擎只会说要口令：当场问一次
+      // 再重试，否则用户看不到任何能输入口令的地方。
+      final bool needsPassphrase =
+          ref.read(syncControllerProvider).error == kSyncPassphraseRequired;
+      if (mounted && needsPassphrase) {
+        final String? entered = await _askPassphrase();
+        if (entered != null) {
+          await ref
+              .read(syncControllerProvider.notifier)
+              .syncNow(passphrase: entered);
+        }
+      }
     } finally {
       if (mounted) {
         setState(() => _busy = false);
@@ -351,6 +423,7 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
     required String title,
     String? initial,
     bool obscure = false,
+    String? errorText,
   }) async {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final AppColors colors = context.colors;
@@ -375,6 +448,7 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
             filled: true,
             fillColor: colors.surfaceAlt,
             border: const SquircleInputBorder(),
+            errorText: errorText,
           ),
         ),
         actions: <Widget>[

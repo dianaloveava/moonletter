@@ -128,9 +128,7 @@ void main() {
     '真实远端联调（${isRelay ? '中转服务' : 'WebDAV'} @ $url）',
     () {
       test('建成员 → 对端可见 → 改名 → 对端可见 → 删除 → 不复活', () async {
-        final String id = await a.members.create(
-          const MemberInput(name: '小月'),
-        );
+        final String id = await a.members.create(const MemberInput(name: '小月'));
         await a.periods.add(id, '2026-10-01');
 
         final SyncResult first = await a.engine.sync(passphrase: passphrase);

@@ -209,7 +209,10 @@ void main() {
     await c.db.kvDao.put('device_id', 'device-c');
     await c.engine.sync(passphrase: passphrase);
     expect(await c.members.listAll(), hasLength(1));
-    expect(await c.periods.listAllLive(), hasLength(SyncEngine.compactThreshold));
+    expect(
+      await c.periods.listAllLive(),
+      hasLength(SyncEngine.compactThreshold),
+    );
   });
 
   test('重置同步会清空远端并删掉本地主密钥', () async {

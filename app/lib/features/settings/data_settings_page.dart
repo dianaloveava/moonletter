@@ -47,7 +47,9 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.only(bottom: AppSpacing.x4),
+          padding: EdgeInsets.only(
+            bottom: AppSpacing.x4 + MediaQuery.paddingOf(context).bottom,
+          ),
           children: <Widget>[
             GroupedList(
               sections: <Widget>[
@@ -55,11 +57,13 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
                   title: l10n.settingsImportExport,
                   rows: <Widget>[
                     GroupRow(
-                      label: l10n.dataExportJson,
+                      label: l10n.dataExport,
+                      value: 'JSON',
                       onTap: _busy ? null : _exportJson,
                     ),
                     GroupRow(
-                      label: l10n.dataExportCsv,
+                      label: l10n.dataExport,
+                      value: 'CSV',
                       onTap: _busy ? null : _exportCsv,
                     ),
                     GroupRow(

@@ -69,48 +69,53 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
 
     return PageFrame(
       title: l10n.tabCalendar,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Expanded(
-            child: MonthCalendar(
-              initialMonth: _month,
-              onMonthChanged: (String month) => setState(() => _month = month),
-              cellBuilder: (BuildContext context, String date, bool inMonth) {
-                final List<Member> starting =
-                    startingByDate[date] ?? const <Member>[];
-                return CalendarDayCell(
-                  dayNumber: int.parse(date.substring(8, 10)),
-                  inMonth: inMonth,
-                  isToday: date == LocalDate.today(),
-                  isSelected: date == _selected,
-                  isPeriodStart: starting.isNotEmpty,
-                  members: starting,
-                  label: _cellLabel(l10n, date, starting),
-                  onTap: () {
-                    Motion.tap();
-                    setState(() => _selected = date);
-                  },
-                );
-              },
+      child: Padding(
+        // 日期面板贴底：把底栏占的高度让出来，别让它压在底栏下面。
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Expanded(
+              child: MonthCalendar(
+                initialMonth: _month,
+                onMonthChanged: (String month) =>
+                    setState(() => _month = month),
+                cellBuilder: (BuildContext context, String date, bool inMonth) {
+                  final List<Member> starting =
+                      startingByDate[date] ?? const <Member>[];
+                  return CalendarDayCell(
+                    dayNumber: int.parse(date.substring(8, 10)),
+                    inMonth: inMonth,
+                    isToday: date == LocalDate.today(),
+                    isSelected: date == _selected,
+                    isPeriodStart: starting.isNotEmpty,
+                    members: starting,
+                    label: _cellLabel(l10n, date, starting),
+                    onTap: () {
+                      Motion.tap();
+                      setState(() => _selected = date);
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.x2),
-          if (monthPeriods.isEmpty) ...<Widget>[
-            Text(
-              l10n.calendarEmptyMonth,
-              style: AppType.bodySmall.copyWith(color: colors.textSecondary),
+            const SizedBox(height: AppSpacing.x2),
+            if (monthPeriods.isEmpty) ...<Widget>[
+              Text(
+                l10n.calendarEmptyMonth,
+                style: AppType.bodySmall.copyWith(color: colors.textSecondary),
+              ),
+              const SizedBox(height: AppSpacing.x1),
+            ],
+            _DayPanel(
+              date: _selected,
+              members: members,
+              periodsByMember: byMember,
+              predictions: predictions,
+              config: config,
             ),
-            const SizedBox(height: AppSpacing.x1),
           ],
-          _DayPanel(
-            date: _selected,
-            members: members,
-            periodsByMember: byMember,
-            predictions: predictions,
-            config: config,
-          ),
-        ],
+        ),
       ),
     );
   }
