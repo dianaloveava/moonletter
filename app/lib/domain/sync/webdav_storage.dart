@@ -84,6 +84,9 @@ class WebDavStorage implements RemoteStorage {
     if (existing.any((RemoteObject file) => file.path == path)) {
       throw AlreadyExistsException(path);
     }
+    // webdav_client 在写之前会先对目标路径发 OPTIONS，父目录不存在时该请求
+    // 返回 404 而直接失败，所以先递归建目录。
+    await ensureDir(_prefixOf(path));
     await _client.write(full, bytes);
   }
 
