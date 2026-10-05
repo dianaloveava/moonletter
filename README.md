@@ -6,6 +6,8 @@
 
 月有信，日有期。
 
+[English](README.en.md) · 中文
+
 ![平台](https://img.shields.io/badge/平台-Windows%20·%20Android-C4737F?style=flat-square&labelColor=8A8A8E)
 ![许可证](https://img.shields.io/badge/许可证-MIT-C4737F?style=flat-square&labelColor=8A8A8E)
 ![版本](https://img.shields.io/badge/版本-0.1.0-C4737F?style=flat-square&labelColor=8A8A8E)
