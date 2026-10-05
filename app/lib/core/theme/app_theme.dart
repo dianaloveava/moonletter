@@ -60,11 +60,11 @@ abstract final class AppTheme {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
-          TargetPlatform.android: _SlideFadePageTransitionsBuilder(),
-          TargetPlatform.windows: _SlideFadePageTransitionsBuilder(),
-          TargetPlatform.linux: _SlideFadePageTransitionsBuilder(),
-          TargetPlatform.macOS: _SlideFadePageTransitionsBuilder(),
-          TargetPlatform.iOS: _SlideFadePageTransitionsBuilder(),
+          TargetPlatform.android: _SlidePageTransitionsBuilder(),
+          TargetPlatform.windows: _SlidePageTransitionsBuilder(),
+          TargetPlatform.linux: _SlidePageTransitionsBuilder(),
+          TargetPlatform.macOS: _SlidePageTransitionsBuilder(),
+          TargetPlatform.iOS: _SlidePageTransitionsBuilder(),
         },
       ),
       bottomSheetTheme: BottomSheetThemeData(
@@ -83,10 +83,12 @@ abstract final class AppTheme {
   }
 }
 
-/// 二三级页面的切换动效：进场页淡入 + 从右侧 6% 滑入，出场页向左轻移做出层叠感。
-/// 时长 250ms、弹簧曲线，与弹层、分栏切换保持同一套动效语言。
-class _SlideFadePageTransitionsBuilder extends PageTransitionsBuilder {
-  const _SlideFadePageTransitionsBuilder();
+/// 二三级页面的切换动效：新页面（不透明）从右侧整屏滑入盖住旧页面，旧页面不动。
+/// 不用淡入淡出：两层同时半透明时上下两个页面会互相透出、叠在一起，而且整屏
+/// opacity 每帧都要开离屏图层重绘，在中低端机上就是肉眼可见的一顿。
+/// 时长 250ms、弹簧曲线，与分栏切换、弹层保持同一套动效语言。
+class _SlidePageTransitionsBuilder extends PageTransitionsBuilder {
+  const _SlidePageTransitionsBuilder();
 
   @override
   Duration get transitionDuration => Motion.medium;
@@ -100,26 +102,13 @@ class _SlideFadePageTransitionsBuilder extends PageTransitionsBuilder {
     Widget child,
   ) {
     return SlideTransition(
-      position: secondaryAnimation.drive(
+      position: animation.drive(
         Tween<Offset>(
-          begin: Offset.zero,
-          end: const Offset(-0.04, 0),
+          begin: const Offset(1, 0),
+          end: Offset.zero,
         ).chain(CurveTween(curve: Motion.spring)),
       ),
-      child: SlideTransition(
-        position: animation.drive(
-          Tween<Offset>(
-            begin: const Offset(0.06, 0),
-            end: Offset.zero,
-          ).chain(CurveTween(curve: Motion.spring)),
-        ),
-        child: FadeTransition(
-          opacity: animation.drive(
-            CurveTween(curve: const Interval(0, 0.6, curve: Curves.easeOut)),
-          ),
-          child: child,
-        ),
-      ),
+      child: child,
     );
   }
 }

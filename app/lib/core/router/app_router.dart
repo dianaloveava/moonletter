@@ -12,6 +12,15 @@ import '../../features/settings/settings_page.dart';
 import '../../features/shell/adaptive_shell.dart';
 import '../../features/sync/sync_settings_page.dart';
 
+/// 推入的二级页面自带不透明底色：过渡期间上一个页面还在下面画着，底色透明
+/// 就会透出旧页面（两个界面叠在一起）。底色用主题的页面背景色。
+Widget _opaquePage(BuildContext context, Widget child) {
+  return ColoredBox(
+    color: Theme.of(context).scaffoldBackgroundColor,
+    child: child,
+  );
+}
+
 /// 应用路由。三个分支共用一套壳，宽屏时由 [AdaptiveShell] 换成左侧边栏。
 final routerProvider = Provider<GoRouter>((Ref ref) {
   return GoRouter(
@@ -48,8 +57,11 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
                     pageBuilder: (BuildContext context, GoRouterState state) =>
                         MaterialPage<void>(
                           key: state.pageKey,
-                          child: MemberDetailPage(
-                            memberId: state.pathParameters['id']!,
+                          child: _opaquePage(
+                            context,
+                            MemberDetailPage(
+                              memberId: state.pathParameters['id']!,
+                            ),
                           ),
                         ),
                   ),
@@ -70,7 +82,7 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
                     pageBuilder: (BuildContext context, GoRouterState state) =>
                         MaterialPage<void>(
                           key: state.pageKey,
-                          child: const NotificationSettingsPage(),
+                          child: _opaquePage(context, const NotificationSettingsPage()),
                         ),
                   ),
                   GoRoute(
@@ -78,7 +90,7 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
                     pageBuilder: (BuildContext context, GoRouterState state) =>
                         MaterialPage<void>(
                           key: state.pageKey,
-                          child: const LockSettingsPage(),
+                          child: _opaquePage(context, const LockSettingsPage()),
                         ),
                   ),
                   GoRoute(
@@ -86,7 +98,7 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
                     pageBuilder: (BuildContext context, GoRouterState state) =>
                         MaterialPage<void>(
                           key: state.pageKey,
-                          child: const DataSettingsPage(),
+                          child: _opaquePage(context, const DataSettingsPage()),
                         ),
                   ),
                   GoRoute(
@@ -94,7 +106,7 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
                     pageBuilder: (BuildContext context, GoRouterState state) =>
                         MaterialPage<void>(
                           key: state.pageKey,
-                          child: const SyncSettingsPage(),
+                          child: _opaquePage(context, const SyncSettingsPage()),
                         ),
                   ),
                 ],

@@ -12,7 +12,8 @@ import 'package:moonletter/domain/lock/lock_providers.dart';
 import 'package:moonletter/features/profiles/member_detail_page.dart';
 import 'package:moonletter/features/settings/settings_page.dart';
 
-/// 过渡动画回归：切底栏分页要有淡入 + 轻微上移，二级页面推入要有横向滑动。
+/// 过渡动画回归：切底栏分页要有淡入 + 轻微上移；二级页面推入要有整屏横向
+/// 滑动且不透明（半透明会让两个页面互相透出、叠在一起）。
 /// 动画中途取一帧断言，避免「只有最终状态」这类测不出动画的写法。
 void main() {
   late AppDatabase db;
@@ -121,6 +122,23 @@ void main() {
       isTrue,
       reason: '推入途中新页面应该还在右侧一点的位置',
     );
+    expect(
+      fadesAbove(
+        tester,
+        anchor,
+      ).every((FadeTransition f) => f.opacity.value == 1),
+      isTrue,
+      reason: '推入途中新页面不能半透明，否则和旧页面叠在一起',
+    );
+    expect(
+      tester
+          .widgetList<ColoredBox>(
+            find.ancestor(of: anchor, matching: find.byType(ColoredBox)),
+          )
+          .any((ColoredBox box) => box.color.a == 1),
+      isTrue,
+      reason: '推入的页面要自带不透明底色，不然会透出下面那个页面',
+    );
 
     await tester.pumpAndSettle();
     expect(
@@ -149,9 +167,18 @@ void main() {
       fadesAbove(
         tester,
         anchor,
-      ).any((FadeTransition f) => f.opacity.value < 0.99),
+      ).every((FadeTransition f) => f.opacity.value == 1),
       isTrue,
-      reason: '推入途中新页面应该还没淡入到 100%',
+      reason: '推入途中新页面不能半透明，否则和旧页面叠在一起',
+    );
+    expect(
+      tester
+          .widgetList<ColoredBox>(
+            find.ancestor(of: anchor, matching: find.byType(ColoredBox)),
+          )
+          .any((ColoredBox box) => box.color.a == 1),
+      isTrue,
+      reason: '推入的页面要自带不透明底色，不然会透出下面那个页面',
     );
     expect(
       slidesAbove(
