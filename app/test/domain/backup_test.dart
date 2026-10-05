@@ -75,7 +75,12 @@ void main() {
       includeAvatars: false,
     );
     final int applied = await targetRepo.applyRecords(
-      diffToApply(local, mergeRecords(local, incoming)),
+      recordsToRestore(
+        local,
+        incoming,
+        deviceId: 'test-device',
+        now: DateTime.now(),
+      ),
     );
     expect(applied, greaterThan(0));
 
@@ -167,10 +172,54 @@ void main() {
       includeAvatars: false,
     );
     final int applied = await repository.applyRecords(
-      diffToApply(localRecords, mergeRecords(localRecords, stale)),
+      recordsToRestore(
+        localRecords,
+        stale,
+        deviceId: 'test-device',
+        now: DateTime.now(),
+      ),
     );
     expect(applied, 0);
     expect((await members.byId(id))!.name, '本地新名字');
+  });
+
+  test('导入恢复被删除的成员与其经期记录', () async {
+    final String id = await members.create(
+      const MemberInput(name: '小月', defaultCycleDays: 30),
+    );
+    await periods.add(id, '2026-10-01', endDate: '2026-10-05');
+    final String json = encodeBackupJson(
+      await repository.collectRecords(includeAvatars: false),
+    );
+
+    await members.delete(id);
+    expect(await members.listAll(), isEmpty);
+    expect(await periods.listAllLive(), isEmpty);
+
+    final List<SyncRecord> local = await repository.collectRecords(
+      includeAvatars: false,
+    );
+    final int applied = await repository.applyRecords(
+      recordsToRestore(
+        local,
+        decodeBackupJson(json),
+        deviceId: 'test-device',
+        now: DateTime.now(),
+      ),
+    );
+
+    expect(applied, 2, reason: '成员与经期记录都恢复');
+    final Member restored = (await members.listAll()).single;
+    expect(restored.name, '小月');
+    expect(restored.updatedBy, 'test-device');
+    expect(
+      restored.updatedAt,
+      greaterThan(local.firstWhere((r) => r.id == id).updatedAt),
+      reason: '恢复要盖新的时间戳，否则下次同步会被旧墓碑再次删掉',
+    );
+    final Period period = (await periods.listAllLive()).single;
+    expect(period.startDate, '2026-10-01');
+    expect(period.endDate, '2026-10-05');
   });
 
   test('CSV 带 BOM 且能原样解析回来', () async {

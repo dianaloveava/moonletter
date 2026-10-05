@@ -173,7 +173,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
       _toast(l10n.dataImportedRecords(applied));
     } on FormatException catch (error) {
       _toast(error.message);
-    } catch (error) {
+    } catch (_) {
       _toast(l10n.dataImportFailed);
     } finally {
       if (mounted) {
@@ -182,16 +182,19 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
     }
   }
 
-  /// JSON 备份：按记录合并，不覆盖更新的本地记录。
+  /// JSON 备份：按记录恢复。文件里的存活记录会覆盖本地墓碑（用户主动恢复），
+  /// 其余按时间戳取新，不覆盖更新的本地记录。
   Future<int> _importJson(String text) async {
     final List<SyncRecord> incoming = decodeBackupJson(text);
     final repository = ref.read(syncRepositoryProvider);
     final List<SyncRecord> local = await repository.collectRecords(
       includeAvatars: false,
     );
-    final List<SyncRecord> toApply = diffToApply(
+    final List<SyncRecord> toApply = recordsToRestore(
       local,
-      mergeRecords(local, incoming),
+      incoming,
+      deviceId: await ref.read(deviceIdProvider.future),
+      now: DateTime.now(),
     );
     final int applied = await repository.applyRecords(toApply);
     await _markImportedMembersDirty(toApply);
